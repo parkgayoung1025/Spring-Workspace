@@ -161,8 +161,8 @@ public class MemberController {
 //		model.addAttribute("errorMsg", "오류발생"); // == request.setAttribute("errorMsg", "오류발생");
 //		
 //		// Model의 기본 scope는 request scope임. 단, session scope로 변환하고 싶은 경우
-//		// 클래스 레벨로 @SessionAttributes를 작성하면 된다. // 19번째 줄에 작성되어있음
-//		model.addAttribute("loginMember", m); // == request.getSession().setAttribute ... // 19번째 줄에 작성되어있음
+//		// 클래스 레벨로 @SessionAttributes를 작성하면 된다. // 24번째 줄에 작성되어있음
+//		model.addAttribute("loginMember", m); // == request.getSession().setAttribute ... // 24번째 줄에 작성되어있음
 //		
 //		System.out.println(m);
 //		
