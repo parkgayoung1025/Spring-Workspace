@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+<configuration>
+	<settings>
+		<setting name="jdbcTypeForNull" value="NULL"/>
+		<!-- 만약에 NULL로 데이터가 전달되었다면 빈칸이 아닌 NULL로 인식하겠다. !!알아둬야 함 잊지 말기!! -->
+		
+		<setting name="logImpl" value="LOG4J"/>
+		<!-- 마이바티스의 쿼리문, 파라미터 값, 실행 결과를 로그를 통해 확인하기 위한 설정 정보
+			 (실제 운영 환경에서는 빼야 함)
+			 VALUE 값에는 로그 출력 구현 객체로 LOG4J라는 클래스를 지정함.
+		 -->
+	</settings>
+	
+	<typeAliases>
+		<typeAlias type="com.kh.spring.member.model.vo.Member" alias="member"/>
+	</typeAliases>
+	
+	<!-- 
+		enviroments, datasource에 기술했던 db연결 정보는 별도로 기술할 예정(root-context.xml에 작성)
+		-> root-context.xml(db등록은 서버 연동와 동시에 이루어져야하기 때문에 서버 연결과 동시에 읽혀지는
+		   root-context.xml에 기술하는 것임)
+	 -->
+	 
+	 <mappers>
+	 	<mapper resource="/mappers/member-mapper.xml"/>
+	 </mappers>
+</configuration>
