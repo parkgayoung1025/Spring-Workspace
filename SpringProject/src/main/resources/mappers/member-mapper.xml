@@ -25,7 +25,24 @@
 	 	SELECT *
 	 	FROM MEMBER
 	 	WHERE USER_ID = #{userId} AND
-	 		  USER_PWD = #{userPwd} AND
+	 		 <!--  USER_PWD = #{userPwd} AND -->
 	 		  STATUS = 'Y'
 	 </select>
+	 
+	 <insert id="insertMember" parameterType="member">
+	 	INSERT INTO MEMBER
+	 	VALUES
+	 	(
+	 		SEQ_UNO.NEXTVAL,
+	 		#{userId},
+	 		#{userPwd},
+	 		#{nickName},
+	 		#{phone},
+	 		#{address},
+	 		DEFAULT, 
+	 		DEFAULT, 
+	 		NULL, 
+	 		DEFAULT
+	 	)
+	 </insert>
 </mapper>
