@@ -1,5 +1,7 @@
 package com.kh.spring.member.controller;
 
+import java.util.ArrayList;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,11 +16,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.google.gson.Gson;
 import com.kh.spring.member.model.service.MemberService;
 import com.kh.spring.member.model.service.MemberServiceImpl;
 import com.kh.spring.member.model.vo.Member;
@@ -333,4 +337,27 @@ public class MemberController {
 		return "redirect:/";
 	}
 	
+	@ResponseBody // 반환되는 값이 forward/redirect 경로가 아닌 값 그 자체임을 의미(ajax 시 사용)
+	@PostMapping("/selectOne")
+	public String selectOne(String input) {
+		
+		Member m = new Member();
+		m.setUserId(input);
+		
+		Member searchMember = memberService.loginMember(m);
+		
+		// JSON : 자바스크립트 객체 표기법으로 작성된 "문자열" 형태의 객체
+		
+		// GSON 라이브러리 : JSON을 보다 쉽게 다루기 위한 google에서 배포한 라이브러리
+		return new Gson().toJson(searchMember);
+	}
+	
+	@ResponseBody
+	@GetMapping("/selectAll")
+	public String selectAll() {
+		
+		ArrayList<Member> list = memberService.selectAll();
+		
+		return new Gson().toJson(list);
+	}
 }

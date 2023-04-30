@@ -45,4 +45,10 @@
 	 		DEFAULT
 	 	)
 	 </insert>
+	 
+	 <select id="selectAll" resultMap="memberResultSet">
+	 	SELECT *
+	 	FROM MEMBER
+	 	WHERE STATUS='Y'
+	 </select>
 </mapper>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="boardMapper">
+	<resultMap type="boardType" id="boardTypeResultSet">
+		<id column="BOARD_CD" property="boardCd"/>
+		<result column="BOARD_NAME" property="boardName"/>
+	</resultMap>
+	
+	<select id="selectBoardTypeList" resultMap="boardTypeResultSet">
+		SELECT *
+		FROM BOARD_TYPE
+		ORDER BY BOARD_CD
+	</select>
+</mapper>

@@ -10,6 +10,12 @@
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
+  
+  <!-- 
+  	DispatcherServlet : 요청(request)/응답(response)을 나눠주는 서블릿
+  						모든 요청을 가장 먼저 앞에서 받아들여서 알맞은 controller로 연결을 해 주고
+  						controller의 반환 결과에 따라서 알맞은 view를 선택해 클라이언트에게 응답하는 역할
+   -->
   <servlet>
     <servlet-name>appServlet</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -23,6 +29,7 @@
     <servlet-name>appServlet</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
+  
   <filter>
     <filter-name>encodingFilter</filter-name>
     <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>

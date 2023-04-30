@@ -1,5 +1,7 @@
 package com.kh.spring.member.model.service;
 
+import java.util.ArrayList;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,8 +32,17 @@ public class MemberServiceImpl implements MemberService {
 	
 	@Override
 	public int insertMember(Member inputMember) {
-		int result = memberDao.insertMember(inputMember);
-		
-		return result;
+//		int result = memberDao.insertMember(inputMember);
+//		
+//		return result;
+		return memberDao.insertMember(inputMember);
+	}
+	
+	@Override
+	public ArrayList<Member> selectAll() {
+//		ArrayList<Member> list = memberDao.selectAll();
+//		
+//		return list;
+		return memberDao.selectAll();
 	}
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
@@ -34,6 +35,15 @@
 	 -->
 	<context:component-scan base-package="com.kh.spring" />
 	
-	
+	<!-- 
+		Interceptor : 컨트롤러에 요청이 들어가기 전/후를 나눠서 인터셉터가 중간에 요청을 가로챔
+					  스프링의 모든 빈 객체에 접근이 가능하며, 일반적으로 로그인 체크, 권한 체크, 프로그램 실행 시간 체크 등에 사용된다.
+	 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+				<beans:bean class="com.kh.spring.common.interceptor.BoardTypeInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors>
 	
 </beans:beans>
