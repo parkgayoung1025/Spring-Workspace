@@ -6,9 +6,108 @@
 		<result column="BOARD_NAME" property="boardName"/>
 	</resultMap>
 	
+	<!-- 게시글 목록용 resultMap -->
+	<resultMap type="board" id="boardResultSet">
+		<result column="BOARD_NO" property="boardNo"/>
+		<result column="BOARD_TITLE" property="boardTitle"/>
+		<result column="BOARD_WRITER" property="boardWriter"/>
+		<result column="NICK_NAME" property="nickName"/>
+		<result column="COUNT" property="count"/>
+		<result column="CREATE_DATE" property="createDate"/>
+		<result column="BOARD_CD" property="boardCd"/>
+		<result column="THUMBNAIL" property="thumbnail"/>
+	</resultMap>
+	
+	<!-- 게시글 상세 조회용 resultMap -->
+	<resultMap type="board" id="boardDetailResultSet">
+		<result column="BOARD_NO" property="boardNo"/>
+		<result column="BOARD_TITLE" property="boardTitle"/>
+		<result column="BOARD_WRITER" property="boardWriter"/>
+		<result column="NICK_NAME" property="nickName"/>
+		<result column="COUNT" property="count"/>
+		<result column="CREATE_DATE" property="createDate"/>
+		<result column="BOARD_CONTENT" property="boardContent"/>
+		<result column="USER_NO" property="userNo"/>
+		<result column="PROFILE_IMG" property="profileImage"/>
+		
+		<collection property="imgList" javaType="java.util.ArrayList" ofType="boardImg" 
+			select="selectImgList" column="BOARD_NO"/>
+			<!-- 
+				selectImgList의 조회 결과를 Board VO클래스의 imgList 필드에 담겠다는 의미
+				-> imgList에 담기 위한 ArrayList<BoardImg> 객체를 생성하겠다.
+				   (javaType -> ArrayList, ofType(제네릭) -> BoardImg)
+				
+				-> selectImgList 태그 수행 시 필요한 파라미터는 현재 resultMap의 BOARD_NO 컬럼에 저장된 값을 전달하겠다.
+				-> 즉, resultMap이 한 번 수행된 후 다시 한 번 수행됨
+				
+				게시글 상세 조회 후 BoardDetailResultSet이 호출되었을 때 상세 조회 결과 중 BOARD_NO를 이용해서 selectImgList를
+				수행하고 결과를 imgList 필드에 세팅하겠다.
+			 -->
+	</resultMap>
+	
+	<resultMap type="boardImg" id="boardImgResultSet">
+		<result column="BOARD_IMG_NO" property="boarImgNo"/>
+		<result column="ORIGIN_NAME" property="originName"/>
+		<result column="CHANGE_NAME" property="changeName"/>
+		<result column="REF_BNO" 	property="refBno"/>
+		<result column="IMG_LEVEL" property="imgLevel"/>
+	</resultMap>
+	
+	<select id="selectImgList" resultMap="boardImgResultSet">
+		SELECT *
+		FROM BOARD_IMG
+		WHERE REF_BNO = #{boardNo}
+		ORDER BY IMG_LEVEL
+	</select>
+	
 	<select id="selectBoardTypeList" resultMap="boardTypeResultSet">
 		SELECT *
 		FROM BOARD_TYPE
 		ORDER BY BOARD_CD
 	</select>
+	
+	<select id="selectBoardListCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM BOARD
+		WHERE BOARD_CD = #{boardCode} AND STATUS = 'Y'
+	</select>
+	
+	<select id="selectBoardList" resultMap="boardResultSet">
+		SELECT 
+			   BOARD_NO,
+			   BOARD_TITLE,
+			   BOARD_WRITER,
+			   NICK_NAME,
+			   COUNT,
+			   B.CREATE_DATE,
+			   (
+			   		SELECT CHANGE_NAME FROM BOARD_IMG
+			   		WHERE BOARD_NO = REF_BNO AND IMG_LEVEL = 0
+			   ) THUMBNAIL
+		FROM BOARD B
+		JOIN MEMBER ON USER_NO = BOARD_WRITER
+		WHERE B.STATUS = 'Y' AND BOARD_CD = #{boardCode}
+		ORDER BY B.CREATE_DATE DESC
+	</select>
+	
+	<select id="selectBoardDetail" resultMap="boardDetailResultSet">
+		SELECT
+			   BOARD_NO,
+			   BOARD_WRITER,
+			   NICK_NAME,
+			   BOARD_TITLE,
+			   COUNT,
+			   BOARD_CONTENT,
+			   TO_CHAR(B.CREATE_DATE, 'YYYY"년" MM"월" DD"일" HH24:MI:SS') CREATE_DATE
+		FROM BOARD B
+		JOIN MEMBER M ON M.USER_NO = B.BOARD_WRITER
+		<!-- LEFT JOIN BOARD_IMG BI ON B.BOARD_NO = BI.REF_BNO -->
+		WHERE BOARD_NO = #{boardNo}
+	</select>
+	
+	<update id="updateReadCount">
+		UPDATE BOARD SET
+		COUNT = COUNT + 1
+		WHERE BOARD_NO = #{boardNo}
+	</update>
 </mapper>

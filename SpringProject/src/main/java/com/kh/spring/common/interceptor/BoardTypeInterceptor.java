@@ -38,11 +38,11 @@ public class BoardTypeInterceptor extends HandlerInterceptorAdapter {
 	
 	@Override // 후 처리할 메서드 작성
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
-		System.out.println("후처리 실행");
+		//System.out.println("후처리 실행");
 	}
 	
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-		System.out.println("view 처리 완료 후 실행");
+		//System.out.println("view 처리 완료 후 실행");
 	}
 }
