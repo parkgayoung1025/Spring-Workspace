@@ -16,7 +16,7 @@
 	 	  dataSource : java에서 Connection Pool을 지원하기 위한 인터페이스
 	 	  destory-method="close" : 주어진 세션을 자동으로 반환하는 설정
 	 -->                                                 <!-- id 값이 변수명 -->
-	 <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource" destroy-method="close">
+	 <bean class="org.apache.commons.dbcp.BasicDataSource" id="realDataSource" destroy-method="close">
 	 	<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
 	 	<property name="url" value="jdbc:oracle:thin:@localhost:1521:orcl"/>
 	 	<property name="username" value="SPRING"/>
@@ -31,6 +31,21 @@
 	 	<property name="minIdle" value="10"/> <!-- 유휴 상태로 존재할 수 있는 커넥션 최소 수, 기본 0 -->
 	 	<property name="maxIdle" value="20"/> <!-- 유휴 상태로 존재할 수 있는 커넥션 최대 수, 기본 8 -->
 	 	<property name="maxWait" value="-1"/> <!-- 예외 발생 전 커넥션이 반환될 때 까지 대기하는 시간, 기본 -1(무기한) -->
+	 </bean>
+	 
+	 <!-- 
+	 	log4j를 이용한 SQL로그 출력용 BEAN 생성
+	 	
+	 	* realDataSource 이용해서 SQL 수행 내용, 수행 결과를 울력하는 역할
+	  -->
+	 <bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+	 	<constructor-arg ref="realDataSource"/>
+	 	<property name="logFormatter">
+	 		<bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+	 			<property name="loggingType" value="MULTI_LINE"/>
+	 			<property name="sqlPrefix" value="[SQL]"/>
+	 		</bean>
+	 	</property>
 	 </bean>
 	 
 	 <!-- 
@@ -77,6 +92,21 @@
 	     <!-- 스프링에서 사용하는 proxy를 이용한 트랜잭션 제어가 안 먹힐 경우 트랜잭션 매니저를 추가 -->
 	     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 	     	<property name="dataSource" ref="dataSource"></property>
+	     </bean>
+	     
+	     <bean class="org.springframework.web.multipart.commons.CommonsMultipartResolver" id="multipartResolver">
+	     	<!-- defaultEncoding : 업로드 되는 파일에 대한 인코딩 처리 여부 -->
+	     	<property name="defaultEncoding" value="UTF-8"/>
+	     	
+	     	<!-- 
+	     		maxUploadSize : 한 번에 전체 업로드 되는 파일의 총 용량 설정
+	     	 -->
+	     	<property name="maxUploadSize" value="10000000"/> <!-- 10mbyte -->
+	     	
+	     	<!-- 
+	     		maxInMemorySize : 디스크에 임시 파일을 생성하기 전에 메모리에 보관할 수 있는 최대 바이트 크기
+	     	 --> 
+	     	 <property name="maxInMemorySize" value="10000000"/>
 	     </bean>
 		
 </beans>

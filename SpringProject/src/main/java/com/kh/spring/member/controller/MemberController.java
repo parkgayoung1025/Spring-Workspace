@@ -261,6 +261,8 @@ public class MemberController {
 				cookie.setMaxAge(0); // 유효시간 0초 -> 생성되자마자 소멸
 			}
 			
+			cookie.setPath("/spring");
+			
 			// 쿠키를 응답 시 클라이언트에게 전달
 			resp.addCookie(cookie);
 			
@@ -294,7 +296,7 @@ public class MemberController {
 	@PostMapping("/insert")
 	public String insertMember(Member m, HttpSession session, Model model) {
 		
-		System.out.println("암호화 전 비밀번호 : " + m.getUserPwd());
+		//System.out.println("암호화 전 비밀번호 : " + m.getUserPwd());
 		
 		// 암호화 작업
 		String encPwd = bcryptPasswordEncoder.encode(m.getUserPwd());
@@ -302,7 +304,7 @@ public class MemberController {
 		// 암호화 된 pwd를 m의 userPwd 다시 대입
 		m.setUserPwd(encPwd);
 		
-		System.out.println("암호화 후 비밀번호 : " + m.getUserPwd());
+		//System.out.println("암호화 후 비밀번호 : " + m.getUserPwd());
 		
 		// 1. memberService 호출해서 insertMember 메서드 실행 후 db에 회원 객체 등록
 		int result = memberService.insertMember(m);

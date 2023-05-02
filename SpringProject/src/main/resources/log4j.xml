@@ -10,6 +10,14 @@
 		</layout>
 	</appender>
 	
+	<!-- SQL 로그 출력용 패턴 지정 -->
+	<appender name="sql-console" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%m%n"/>
+		</layout>
+	</appender>
+	
 	<!-- Application Loggers -->
 	<logger name="com.kh.spring">
 		<level value="info" />
@@ -30,6 +38,37 @@
 
 	<logger name="org.springframework.web">
 		<level value="info" />
+	</logger>
+	
+	<!-- SQL 로그 출력 -->
+	<logger name="java.sql.Connection">
+		<lebel value="debug"/>
+		<appender-ref ref="sql-console"/>
+	</logger>
+	
+	<logger name="java.sql.Statement">
+		<lebel value="debug"/>
+		<appender-ref ref="sql-console"/>
+	</logger>
+	
+	<logger name="java.sql.PreparedStatement">
+		<lebel value="debug"/>
+		<appender-ref ref="sql-console"/>
+	</logger>
+	
+	<logger name="java.sql.ResultSet">
+		<lebel value="debug"/>
+		<appender-ref ref="sql-console"/>
+	</logger>
+	
+	<logger name="jdbc.sqlonly" additivity="false">
+		<level value="INFO"/>
+		<appender-ref ref="sql-console"/>
+	</logger>
+	
+	<logger name="jdbc.resultsettable" additivity="false">
+		<level value="INFO"/>
+		<appender-ref ref="sql-console"/>
 	</logger>
 
 	<!-- Root Logger -->
