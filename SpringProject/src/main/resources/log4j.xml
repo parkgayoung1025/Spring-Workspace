@@ -1,13 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" "log4j.dtd">
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
-
+	<!-- 
+		log4j
+		- 프로그램 작동 시 로그를 남기기 위한 자바 기반 오픈소스 로깅 라이브러리
+		  로그에 레벨을 지정해서 지정한 레벨 이상의 로그 정보만 기록하는 방식
+		  System.out.println을 사용하지 않은 이유 : 속도나 성능면에서 훨씬 최적화되어있음
+	 -->
+	 
+	 <!-- 
+	 	ConsoleAppender : 콘솔 창에 메시지를 출력해 주는 클래스
+	 	FileAppender : 파일에 메시지를 출력하는 클래스
+	 	
+	 	로그 레벨 설정
+	 	FATAL > ERROR > WARN > INFO > DEBUGER > TRACE
+	 	
+	 	FATAL : 애플리케이션이 동작이 불가능할 정도의 에러 발생 시 로그를 찍어줌
+	 	ERROR : 요청 처리 중 에러 발생 시 로그를 찍어줌
+	 	WARN : 심각한 문제는 아니지만 추후 에러 발생 가능성을 알려주는 로그
+	 	INFO : 일반 정보성 메시지를 나타냄
+	 	DEBUGER : 개발 시 디버그 용도로 로그를 찍어줌
+	 	TRACE : 1.2 이상 버전에서 추가됨. DEBUGER보다 좀 더 상세하게 표현해 준다.
+	 	
+	 	개발할 때는 DEBUGER로 작업을 하면서 테스트해 보다가
+	 	운영 환경으로 넘어가면 INFO 모드로 필요한 정보성 메시지만 출력해 주게끔 변경해 줘야 함.
+	  -->
+	  
 	<!-- Appenders -->
 	<appender name="console" class="org.apache.log4j.ConsoleAppender">
 		<param name="Target" value="System.out" />
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%-5p: %c - %m%n" />
+			<param name="ConversionPattern" value="[%d{HH:mm:ss.SSS}] %-5p %C{1}.%M(%F:%L) - %m%n" />
+			<!-- 
+				%p : 우선순위 레벨
+				%C : 호출할 클래스명
+				%m : 실행된 메서드
+				%F : 로그 발생한 파일명 
+			 -->
 		</layout>
+	</appender>
+	
+	<!-- 
+		DailyRollingFileAppender : 일정 기간 단위로 로그 파일을 생성하고 기록하도록 도와주는 클래스
+	 -->
+	<appender name="dailyLog" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="threshold" value="INFO"/>
+		<!-- logger 안에 appender-ref 아래 dailyLog 객체를 사용 시 level 정보가 없다면 threshold에 설정한 정보를 사용하겠다는 의미 -->
+		<param name="Append" value="true"/>
+		<!-- 파일 이어 쓰기 여부. true - 이어 쓰기, false - 새로 생성 -->
+		<param name="File" value="C:\\Spring-Workspace\\spring_log\\kh.log"/>
+		<!-- 폴더에 접근 권한이 없는 경우 에러 발생할 수 있음 -->
+		<param name="DatePattern" value="'.'yyyyMMdd"></param>
+		<!-- 
+			현재 만든 DatePattern은 매일 자정에 로그 파일을 바꿔주는 명령어
+			
+			yyyyMM : 매달 바꿔주는 명령어
+			yyyyWW : 매주 바꿔주는 명령어
+			yyyyMMdd : 매일 자정
+			yyyyMMdd a : 자정과 정오에 로그 파일을 바꿔주는 명령어
+			
+			그 외 매시간, 매 분 마다도 가능함
+		 -->
+		 <layout class="org.apache.log4j.PatternLayout">
+		 	<param name="ConversionPattern" value="[%d{HH:mm:ss.SSS}] - %m%n"></param>
+		 </layout>
 	</appender>
 	
 	<!-- SQL 로그 출력용 패턴 지정 -->
@@ -17,6 +73,10 @@
 			<param name="ConversionPattern" value="%m%n"/>
 		</layout>
 	</appender>
+	
+	<logger name="com.kh.spring.common.interceptor.LoggingInterceptor">
+		<appender-ref ref="dailyLog"/>
+	</logger>
 	
 	<!-- Application Loggers -->
 	<logger name="com.kh.spring">
@@ -42,22 +102,22 @@
 	
 	<!-- SQL 로그 출력 -->
 	<logger name="java.sql.Connection">
-		<lebel value="debug"/>
+		<level value="debug"/>
 		<appender-ref ref="sql-console"/>
 	</logger>
 	
 	<logger name="java.sql.Statement">
-		<lebel value="debug"/>
+		<level value="debug"/>
 		<appender-ref ref="sql-console"/>
 	</logger>
 	
 	<logger name="java.sql.PreparedStatement">
-		<lebel value="debug"/>
+		<level value="debug"/>
 		<appender-ref ref="sql-console"/>
 	</logger>
 	
 	<logger name="java.sql.ResultSet">
-		<lebel value="debug"/>
+		<level value="debug"/>
 		<appender-ref ref="sql-console"/>
 	</logger>
 	
@@ -73,8 +133,8 @@
 
 	<!-- Root Logger -->
 	<root>
-		<priority value="warn" />
-		<appender-ref ref="console" />
+		<priority value="warn"/>
+		<appender-ref ref="console"/>
 	</root>
 	
 </log4j:configuration>

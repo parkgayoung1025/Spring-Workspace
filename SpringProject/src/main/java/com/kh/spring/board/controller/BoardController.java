@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +33,8 @@ public class BoardController {
 
 	@Autowired
 	private BoardService boardService;
+	
+	private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
 	
 	/*
 	 * 게시글 목록 조회 서비스
@@ -53,7 +57,9 @@ public class BoardController {
 		
 		// 게시글 목록 조회 서비스 호출 시 작업 내용
 		// 1) 게시판 이름 조회
-		
+//		if(true) {
+//			throw new RuntimeException();
+//		}
 		// 검색 요청을 하지 않은 경우
 		if (paramMap.get("condition") == null) {
 			boardService.selectBoardList(currentPage, boardCode, map);
@@ -170,6 +176,8 @@ public class BoardController {
 		String serverFolderPath = session.getServletContext().getRealPath(webPath);
 		b.setBoardCd(boardCode);
 		
+		logger.info("insert 함수 실행");
+		
 		int result = 0;
 		
 		if (mode.equals("insert")) {
@@ -177,7 +185,7 @@ public class BoardController {
 			try {
 				result = boardService.insertBoard(b, imgList, webPath, serverFolderPath);
 			} catch(Exception e) {
-				System.out.println("에러 발생");
+				logger.error("insert 메서드 에러");
 			}
 		} else {
 			// 게시글 수정 서비스 호출
@@ -185,7 +193,7 @@ public class BoardController {
 			try {
 				result = boardService.updateBoard(b, imgList, webPath, serverFolderPath, deleteList);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("update 메서드 에러");
 			}
 		}
 		

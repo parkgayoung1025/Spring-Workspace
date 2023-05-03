@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="chattingMapper">
+
+	<resultMap type="chatRoom" id="chatRoomResultSet">
+		<result property="chatRoomNo" column="CHAT_ROOM_NO"/>
+		<result property="title" column="TITLE"/>
+		<result property="nickName" column="NICK_NAME"/>
+		<result property="cnt" column="CNT"/>
+		
+		<result property="userNo" column="USER_NO"/>
+		<result property="status" column="STATUS"/>
+	</resultMap>
+
+	<select id="selectChatRoomList" resultMap="chatRoomResultSet">
+		SELECT 
+			CHAT_ROOM_NO,
+			TITLE,
+			NICK_NAME,
+			(SELECT COUNT(*)
+			 FROM CHAT_ROOM_JOIN B
+			 WHERE B.CHAT_ROOM_NO = A.CHAT_ROOM_NO) CNT
+		FROM CHAT_ROOM A
+		LEFT JOIN MEMBER M USING(USER_NO)
+		WHERE A.STATUS = 'Y'
+		ORDER BY CHAT_ROOM_NO DESC
+	</select>
+	
+</mapper>

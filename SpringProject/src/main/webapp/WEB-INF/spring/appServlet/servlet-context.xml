@@ -4,9 +4,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:websocket="http://www.springframework.org/schema/websocket"
+	xsi:schemaLocation="http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket-4.3.xsd
+		http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
 
 	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
 	
@@ -44,6 +48,80 @@
 			<mvc:mapping path="/**"/>
 				<beans:bean class="com.kh.spring.common.interceptor.BoardTypeInterceptor"/>
 		</mvc:interceptor>
+		
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+				<beans:bean class="com.kh.spring.common.interceptor.LoggingInterceptor"/>
+		</mvc:interceptor>
 	</mvc:interceptors>
+	
+	<!-- 
+		interceptor 특징
+		1. dispatcherServlet이 controller를 호출하기 전/후로 끼어드기 때문에 controller에 전달하기 전인 
+		   request와 response의 데이터를 처리하기에 용이하며, application영역에 사용하는 객체에 대한 설정을 하기에도 좋다.
+		
+		2. AOP
+		
+		스프링 요청/응답 흐름
+		- 요청(request) -> Filter -> DispatcherServlet(HandlerMapping) -> Interceptor -> Controller -> AOP -> Service -> Dao
+																															 (DB)
+		- 응답 <- Filter <- DispatcherServlet(ViewResolver) <- Interceptor <- Controller <- AOP <- Service <- Dao 
+	 -->
+	 
+	 <!-- 트랜잭션 처리 시 필요한 @Transactional 어노테이션 활성화시키기
+	 	  @Transactional : 클래스 혹은 메서드 수행 후에 트랜잭션을 처리하라고 알려주는 어노테이션 -->
+	 <tx:annotation-driven transaction-manager="transactionManager"/>
+	 
+	 <!-- webSocket 요청 시 핸들러 클래스와 연걸하기 -->
+	 <beans:bean id="chatHandler" class="com.kh.spring.chat.model.websocket.ChatWebsocketHandler"/>
+	 
+	 <websocket:handlers>
+	 	<!-- 웹소켓 요청 시 요청 주소를 처리할 bean 객체 지정 -->
+	 	<websocket:mapping handler="chatHandler" path="/chat"/>
+	 	
+	 	<websocket:handshake-interceptors>
+	 		<!-- 
+	 			interceptor : http 통신에서 request와 response를 가로채는 역할
+	 			
+	 			handshake-interceptores : 요청 관련 데이터 중 httpSession 정보를 가로채서 webSocketSession에게 넣어줌
+	 		 -->
+	 		 <beans:bean class="org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor"/>
+	 	</websocket:handshake-interceptors>
+	 	
+	 	<!-- SocketJS 라이브러리를 이용해서 만들어진 웹소켓 객체임을 의미한다. -->
+	 	<websocket:sockjs/>
+	 </websocket:handlers>
+	 
+	 <!-- 
+	 	HandlerMapping을 통해서 어떤 url로 요청했을 때 어떤 controller가 구동될 것인지를 알아내야 한다.
+	 	
+	 	1. 요청 때마다 실행될 controller들을 bean으로 등록시켜두기
+		  <beans:bean class="com.kh.spring.board.controller.BoardController" id="loginController"/>
+		  <beans:bean class="com.kh.spring.board.controller.BoardController" id="loginController"/>
+		  <beans:bean class="com.kh.spring.board.controller.BoardController" id="loginController"/>
+		  .. (등록할 컨트롤러 개수만큼 bean을 등록시켜줘야 함)
+		2. 어떤 url로 요청이 들어온 것을 처리할 것인지 매핑 시켜줘야 한다.
+		  <beans:bean class="org.springframework.web.servlet.handler.simpleUrlHandlerMapping">
+		  	<beans:property name="mappings">
+		  		<bean:prop key="login">memberController</bean:prop>
+		  		<bean:prop key="insert">memberController</bean:prop>
+		  	</beans:property>
+		  </beans:bean>
+		  
+		  위와 같은 방식으로 xml로 빈을 등록을 한다면, bean 개수가 너무 많아지면 관리가 어려워진다.
+		  또한, 여러 개발자가 같은 xml 파일을 수정하면 충돌이 쉽게 발생할 수 있다.
+		  
+		  장점 : xml 문서 내에 한 눈으로 볼 수 있기 때문에 관리의 편의성이 높음
+		  
+		  * 어노테이션 방식
+		  - component-scan에서 지정한 패키지명(com.kh.spring)의 하위 모든 클래스를 스캔하여
+		  @Controller와 같은 MVC 어노테이션이 붙은 클래스를 자동으로 bean으로 등록해 주는 방식
+		  @Service
+		  @Repository
+		  ...
+		  
+		  단, 내가 직접 만든 클래스가 아닐 경우(spring에서 제공하는 클래스이거나 컴파일된 class일 경우) 소스 코드 내부를
+		  수정할 수 없기 때문에 코드에 어노테이션을 붙일 수가 없다. 따라서 이 경우에는 xml 방식으로 bean을 등록해 줘야 한다.
+	  -->
 	
 </beans:beans>

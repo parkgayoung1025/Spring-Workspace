@@ -17,6 +17,11 @@
 		<typeAlias type="com.kh.spring.board.model.vo.BoardType" alias="boardType"/>
 		<typeAlias type="com.kh.spring.board.model.vo.Board" alias="board"/>
 		<typeAlias type="com.kh.spring.board.model.vo.BoardImg" alias="boardImg"/>
+		<typeAlias type="com.kh.spring.board.model.vo.Reply" alias="reply"/>
+		
+		<typeAlias type="com.kh.spring.chat.model.vo.ChatRoomJoin" alias="chatRoomJoin"/>
+		<typeAlias type="com.kh.spring.chat.model.vo.ChatRoom" alias="chatRoom"/>
+		<typeAlias type="com.kh.spring.chat.model.vo.ChatMessage" alias="chatMessage"/>
 	</typeAliases>
 	
 	<!-- 
@@ -28,5 +33,7 @@
 	 <mappers>
 	 	<mapper resource="/mappers/member-mapper.xml"/>
 	 	<mapper resource="/mappers/board-mapper.xml"/>
+	 	<mapper resource="/mappers/reply-mapper.xml"/>
+	 	<mapper resource="/mappers/chattingMapper.xml"/>
 	 </mappers>
 </configuration>

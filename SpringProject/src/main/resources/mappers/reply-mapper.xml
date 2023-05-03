@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="replyMapper">
+
+	<resultMap type="reply" id="replyResultSet">
+		<result column="REPLY_NO" property="replyNo"/>
+		<result column="REPLY_CONTENT" property="replyContent"/>
+		<result column="REF_BNO" property="refBno"/>
+		<result column="REPLY_WRITER" property="replyWriter"/>
+		<result column="CREATE_DATE" property="createDate"/>
+		<result column="STATUS" property="status"/>
+	</resultMap>
+	
+	<insert id="insertReply" parameterType="reply">
+		INSERT INTO REPLY(
+			REPLY_NO,
+			REPLY_CONTENT,
+			REF_BNO,
+			REPLY_WRITER
+		)
+		VALUES(
+			SEQ_RNO.NEXTVAL,
+			#{replyContent},
+			#{refBno},
+			#{replyWriter}
+		)
+	</insert>
+	
+	<select id="selectReplyList" resultMap="replyResultSet">
+		SELECT 
+			REPLY_NO,
+			REPLY_CONTENT,
+			REF_BNO,
+			NICK_NAME AS REPLY_WRITER,
+			R.CREATE_DATE,
+			R.STATUS
+		FROM REPLY R
+		LEFT JOIN MEMBER M ON R.REPLY_WRITER = M.USER_NO
+		WHERE REF_BNO = #{bno} AND R.STATUS = 'Y'
+	</select>
+</mapper>

@@ -128,9 +128,10 @@
 						//setInterval(selectReplyList , 100);
 					});
 					
+					// 댓글 목록 조회
 					function selectReplyList(){
 						$.ajax({
-							url : '${contextPath}/board/reply.bo',
+							url : '${contextPath}/reply/selectReplyList',
 							data : {bno : '${b.boardNo}'},
 							dataType : 'json',
 							success: function(result){
@@ -156,11 +157,13 @@
 					function insertReply(){
 						
 						$.ajax({
-							url: "insertReply.bo",
+							url: "${contextPath}/reply/insert",
 							data : {
 								refBno : '${b.boardNo}',
-								replyContent: $("#replyContent").val()
+								replyContent: $("#replyContent").val(),
+								replyWriter : '${loginUser.userNo}'
 							},
+							type : 'POST',
 							success : function (result){
 								if(result == "1"){
 									alertify.alert("서비스 요청 성공", '댓글 등록 성공' );
