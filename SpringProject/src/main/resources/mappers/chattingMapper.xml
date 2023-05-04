@@ -11,6 +11,15 @@
 		<result property="userNo" column="USER_NO"/>
 		<result property="status" column="STATUS"/>
 	</resultMap>
+	
+	<resultMap type="chatMessage" id="chatMessageResultSet">
+		<result column="CM_NO" property="cmNo"/>
+		<result column="MESSAGE" property="message"/>
+		<result column="CREATE_DATE" property="createDate"/>
+		<result column="CHAT_ROOM_NO" property="chatRoomNo"/>
+		<result column="USER_NO" property="userNo"/>
+		<result column="NICK_NAME" property="nickName"/>
+	</resultMap>
 
 	<select id="selectChatRoomList" resultMap="chatRoomResultSet">
 		SELECT 
@@ -25,5 +34,82 @@
 		WHERE A.STATUS = 'Y'
 		ORDER BY CHAT_ROOM_NO DESC
 	</select>
+	
+	<insert id="openChatRoom" useGeneratedKeys="true">
+		<selectKey keyProperty="chatRoomNo" resultType="_int" order="BEFORE">
+			SELECT SEQ_CR_NO.NEXTVAL
+			FROM DUAL
+		</selectKey>
+		INSERT INTO CHAT_ROOM
+		VALUES(
+			#{chatRoomNo}, 
+			#{title}, 
+			DEFAULT, 
+			#{userNo}
+		)
+	</insert>
+	
+	<!-- 채팅방 참여여부 확인 -->
+	<select id="joinCheck" resultType="_int" parameterType="chatRoomJoin">
+		SELECT COUNT(*)
+		FROM CHAT_ROOM_JOIN
+		WHERE CHAT_ROOM_NO = #{chatRoomNo}
+			AND USER_NO = #{userNo}
+	</select>
+	
+	<!-- 채팅방 참여하기 -->
+	<insert id="joinChatRoom" parameterType="chatRoomJoin">
+		INSERT INTO CHAT_ROOM_JOIN
+		VALUES(
+			#{userNo},
+			#{chatRoomNo}
+		)
+	</insert>
+	
+	<!-- 채팅 메시지 목록 조회 -->
+	<select id="selectChatMessage" resultMap="chatMessageResultSet">
+		SELECT
+			MESSAGE,
+			CREATE_DATE,
+			USER_NO,
+			NICK_NAME
+		FROM CHAT_MESSAGE
+		JOIN MEMBER USING(USER_NO)
+		WHERE CHAT_ROOM_NO = #{chatRoomNo}
+		ORDER BY CM_NO
+	</select>
+	
+	<!-- 채팅 메시지 삽입 -->
+	<insert id="insertMessage" parameterType="chatMessage">
+		INSERT INTO CHAT_MESSAGE
+		VALUES(
+			SEQ_CM_NO.NEXTVAL,
+			#{message},
+			DEFAULT,
+			#{chatRoomNo},
+			#{userNo}
+		)
+	</insert>
+	
+	<!-- 채팅방 나가기 -->
+	<delete id="exitChatRoom" parameterType="chatRoomJoin">
+		DELETE FROM CHAT_ROOM_JOIN
+		WHERE USER_NO = #{userNo} 
+			AND CHAT_ROOM_NO = #{chatRoomNo} 
+	</delete>
+	
+	<!-- 채팅방 인원수 확인 -->
+	<select id="countChatRoomMember" resultType="_int">
+		SELECT COUNT(*)
+		FROM CHAT_ROOM_JOIN
+		WHERE CHAT_ROOM_NO = #{chatRoomNo}
+	</select>
+	
+	<!-- 채팅방 닫기 -->
+	<update id="closeChatRoom">
+		UPDATE CHAT_ROOM 
+		SET STATUS = 'N'
+		WHERE CHAT_ROOM_NO = #{chatRoomNo}
+	</update>
 	
 </mapper>

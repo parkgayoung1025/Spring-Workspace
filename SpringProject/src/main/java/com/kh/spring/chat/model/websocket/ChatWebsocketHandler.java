@@ -1,5 +1,6 @@
 package com.kh.spring.chat.model.websocket;
 
+import java.sql.Date;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +11,10 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.kh.spring.chat.model.service.ChatService;
+import com.kh.spring.chat.model.vo.ChatMessage;
 
 public class ChatWebsocketHandler extends TextWebSocketHandler {
 
@@ -65,5 +69,34 @@ public class ChatWebsocketHandler extends TextWebSocketHandler {
 		
 		// payLoad : 전송되는 데이터(json 객체)
 		System.out.println("전달된 메시지 : "+message.getPayload());
+		
+		// JackSon 라이브러리 : java에서 json을 다루기 위한 라이브러리
+		
+		// Jackson-databind -> ObjectMapper를 이용해서 JSON 형태로 넘어온 데이터를 특정 VO 필드에 맞게 자동 매핑
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		ChatMessage chatMessage = objectMapper.readValue(message.getPayload(), ChatMessage.class);
+		
+		chatMessage.setCreateDate(new Date(System.currentTimeMillis()));
+		
+		// 전달받은 채팅 메시지를 db에 삽입
+		System.out.println(chatMessage);
+		
+		int result = chatService.insertMessage(chatMessage);
+		
+		if (result > 0) {
+			// 같은 방에 접속 중인 클라이언트에게 전달받은 메시지 뿌리기
+			for (WebSocketSession s : sessions) {
+				// 반복을 진행 중인 WebSocketSession 안에 담겨있는 방 번호 == 메시지 안에 담겨있는 방 번호가 일치하는 경우 메시지 뿌리기
+				int chatRoomNo = (int)s.getAttributes().get("chatRoomNo");
+				
+				// 메시지에 담겨있는 채팅방 번호와 chatRoomNo와 일치하는지 비교
+				if (chatMessage.getChatRoomNo() == chatRoomNo) {
+					// 같은 방 클라이언트에게 JSON 형태로 메시지를 보냄
+					// s.sendMessage(new TextMessage(JSON 객체))
+					s.sendMessage(new TextMessage(new Gson().toJson(chatMessage)));
+				}
+			}
+		}
 	}
 }

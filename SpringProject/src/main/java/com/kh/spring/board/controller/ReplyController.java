@@ -19,7 +19,7 @@ import com.kh.spring.board.model.vo.Reply;
  * -> 특정한 이름으로 요청이 오면 "값" 그 자체로 응답
  * 
  * RestController : 요청에 대한 응답이 모두 값 그 자체인 컨트롤러
- * -> @Controller + @ResponseBody
+ * -> @Controller + @ResponseBody(멤버컨트롤러에서 사용했음)
  */
 @RestController
 @RequestMapping("/reply")

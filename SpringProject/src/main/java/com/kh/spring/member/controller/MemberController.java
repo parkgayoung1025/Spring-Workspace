@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -385,5 +386,18 @@ public class MemberController {
 		model.addAttribute("e", e);
 		
 		return "common/errorPage";
+	}
+	
+	public int count = 0;
+	
+	// 고정 방식(spring-scheduler)
+	@Scheduled(fixedDelay = 1000)
+	public void test() {
+		//System.out.println("1초 마다 출력하기"+ count++);
+	}
+	
+	// crontab 방식
+	public void testCron() {
+		//System.out.println("크론 테스트");
 	}
 }

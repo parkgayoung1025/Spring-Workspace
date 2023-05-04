@@ -57,7 +57,7 @@ div {box-sizing:border-box;}
 		<script>
 			alertify.alert("서비스 요청 성공", '${alertMsg}' );
 		</script>
-		<c:remove var="alertMsg" scope="session" />
+		<c:remove var="alertMsg"/>
 	</c:if>
 
 	
