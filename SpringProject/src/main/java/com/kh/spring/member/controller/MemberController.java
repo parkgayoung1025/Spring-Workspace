@@ -7,21 +7,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.google.gson.Gson;
@@ -32,9 +33,9 @@ import com.kh.spring.member.model.vo.Member;
 @Controller // 생성된 bean객체가 Controller임을 명시 + bean 등록
 @RequestMapping("/member") // localhost:8081/spring/member 이하의 url 요청을 처리하는 컨트롤러
 @SessionAttributes({"loginUser"}) // 로그인, 회원가입 기능 완료 후 실행될 코드
-public class MemberController {
+public class MemberController extends QuartzJobBean {
 	
-	private MemberService ms = new MemberServiceImpl();
+	//private MemberService ms = new MemberServiceImpl();
 	// 기존 객체 생성 방식. 서비스가 동시에 많은 횟수의 요청이 들어오면 그만큼의 객체가 생성됨
 	// 객체 간의 결합도가 올라감
 	
@@ -74,6 +75,10 @@ public class MemberController {
 	public MemberController(MemberService memberService, BCryptPasswordEncoder bcryptPasswordEncoder) {
 		this.memberService = memberService;
 		this.bcryptPasswordEncoder = bcryptPasswordEncoder;
+	}
+	
+	public MemberController() {
+		
 	}
 	
 	/*
@@ -400,4 +405,21 @@ public class MemberController {
 	public void testCron() {
 		//System.out.println("크론 테스트");
 	}
+	
+	public void testQuartz() {
+		//System.out.println("콰츠 테스트");
+	}
+	
+	/*
+	 * 회원 정보 확인 스케줄러
+	 * 매일 오전 1시에 모든 사용자의 정보를 검색하여 사용자가 비밀번호를 안 바꾼지 3개월이 지났다면
+	 * Member 테이블의 changePwd의 값을 y로 변경
+	 * 
+	 * 로그인을 할 때 changePwd의 값이 Y라면 비밀번호 변경 페이지로 이동(이건 안 함)
+	 */
+	@Override // public class MemberController extends QuartzJobBean 에서 extends QuartzJobBean을 하고 @Override를 하면 오버라이드를 한 메서드에 QuartzJobBean이 적용이 됨
+	public void executeInternal(JobExecutionContext context) throws JobExecutionException {
+		memberService.updateMemberChangePwd();
+	}
+	
 }

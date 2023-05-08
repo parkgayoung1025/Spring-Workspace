@@ -51,4 +51,10 @@
 	 	FROM MEMBER
 	 	WHERE STATUS='Y'
 	 </select>
+	 
+	 <update id="updateMemberChangePwd">
+	 	UPDATE MEMBER
+	 	SET CHANGE_PWD = 'Y'
+	 	<![CDATA[WHERE ADD_MONTHS(MODIFY_DATE, 3) < SYSDATE]]>
+	 </update>
 </mapper>

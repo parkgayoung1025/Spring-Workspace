@@ -45,4 +45,10 @@ public class MemberServiceImpl implements MemberService {
 //		return list;
 		return memberDao.selectAll();
 	}
+	
+	@Override
+	public void updateMemberChangePwd() {
+		memberDao.updateMemberChangePwd(); // void라 return해 줄 값이 없어서 return 안 씀
+	}
+	
 }
