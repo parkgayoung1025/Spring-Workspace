@@ -11,6 +11,7 @@ public class Reply {
 	private String replyContent;
 	private int refBno;
 	private String replyWriter;
+	private int userNo;
 	private Date createDate;
 	private String status;
 }
