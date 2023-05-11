@@ -75,11 +75,12 @@ public class MemberController extends QuartzJobBean {
 	public MemberController(MemberService memberService, BCryptPasswordEncoder bcryptPasswordEncoder) {
 		this.memberService = memberService;
 		this.bcryptPasswordEncoder = bcryptPasswordEncoder;
-	}
+	} // 이건 매개 변수가 있는 기본 생성자
 	
 	public MemberController() {
 		
-	}
+	} // 이건 매개 변수가 없는 기본 생성자 
+	// 그래서 setter 함수로 memberService 주입해 줘야함.
 	
 	/*
 	 *  3) setter 방식 의존성 주입
@@ -407,7 +408,7 @@ public class MemberController extends QuartzJobBean {
 	}
 	
 	public void testQuartz() {
-		//System.out.println("콰츠 테스트");
+		System.out.println("콰츠 테스트");
 	}
 	
 	/*
@@ -419,6 +420,14 @@ public class MemberController extends QuartzJobBean {
 	 */
 	@Override // public class MemberController extends QuartzJobBean 에서 extends QuartzJobBean을 하고 @Override를 하면 오버라이드를 한 메서드에 QuartzJobBean이 적용이 됨
 	public void executeInternal(JobExecutionContext context) throws JobExecutionException {
+//		executeInternal 기능을 @Override 사용할 땐 
+//		기본 생성자(public MemberController(){})와 
+//		setter함수
+//		(@Autowired
+//		public void setMemberService(MemberService memberService) {
+//			this.memberService = memberService;
+//		})를 함께 사용해야 한다.
+//		둘 다 작성 안 하면 spring이 자동으로 생성해 줌.
 		memberService.updateMemberChangePwd();
 	}
 	
