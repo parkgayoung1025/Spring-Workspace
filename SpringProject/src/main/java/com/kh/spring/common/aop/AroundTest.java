@@ -19,7 +19,7 @@ public class AroundTest {
 	@Around("CommonPointcut.implPointcut()")
 	public Object checkRuuningTime(ProceedingJoinPoint jp) throws Throwable {
 		
-		// ProceedingJoinPoint 인터페이스 : 전/후 처리 관련된 기능을 제공. TrgetObject의 값을 얻어올 수 있는 메서드도 함께 제공
+		// ProceedingJoinPoint 인터페이스 : 전/후 처리 관련된 기능을 제공. TargetObject의 값을 얻어올 수 있는 메서드도 함께 제공
 		
 		// proceed() 메서드 호출 전 : @Before 용도로 사용할 advice 작성
 		// proceed() 메서드 효출 후 : @After 용도로 사용할 advice 작성
